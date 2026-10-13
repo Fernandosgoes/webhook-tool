@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Webhook Tool",
+  "version": "1.0.0",
+  "description": "Chrome extension that sends structured payloads to Make or n8n webhooks to trigger standardized emails and customer follow-ups.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://hook.us1.make.com/*"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icons/icons top right/Extension icon/ei24.png",
+      "32": "icons/icons top right/Extension icon/ei64.png",
+      "48": "icons/icons top right/Extension icon/ei64.png",
+      "128": "icons/icons top right/Extension icon/ei128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icons top right/Extension icon/ei24.png",
+    "32": "icons/icons top right/Extension icon/ei64.png",
+    "48": "icons/icons top right/Extension icon/ei64.png",
+    "128": "icons/icons top right/Extension icon/ei128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["popup.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}

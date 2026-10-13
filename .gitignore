@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+.claude/
+docs/
+translations/
+popup.css.backup
+PRD.md

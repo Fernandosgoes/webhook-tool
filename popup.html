@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="popup.css">
+  <title>Webhook Tool</title>
+</head>
+<body>
+  <!-- Side notifications (stack) -->
+  <div id="notify-stack" class="notify-stack" aria-live="polite" aria-relevant="additions"></div>
+
+  <div class="top-chrome">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="header-brand">
+          <img class="header-logo" src="icons/icons top right/Extension icon/ei64.png" width="26" height="26" alt="">
+          <div class="header-titles">
+            <h1 class="header-title" data-i18n="header-title">Webhook Tool</h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button type="button" class="header-action-btn header-action-btn--lang" id="btn-lang-toggle" aria-label="Idioma da interface" title="Idioma da interface">
+            <img class="lang-toggle-icon" src="icons/icons top right/language.png" width="11" height="11" alt="" aria-hidden="true">
+            <span class="lang-code">PT</span>
+          </button>
+          <button type="button" class="header-action-btn" id="btn-settings" data-i18n-aria-label="settings-aria" data-i18n-title="settings-aria" aria-label="Configurações" title="Configurações">
+            <img src="icons/icons top right/settings.png" width="13" height="13" alt="" aria-hidden="true">
+          </button>
+          <button type="button" class="header-action-btn" id="btn-about" data-i18n-aria-label="about-title" data-i18n-title="about-title" aria-label="Sobre a extensão" title="Sobre">
+            <img src="icons/icons top right/about.png" width="13" height="13" alt="" aria-hidden="true">
+          </button>
+          <button type="button" class="header-action-btn" id="btn-close" aria-label="Fechar" title="Fechar">
+            <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+      <div class="tab-container">
+        <button type="button" class="tab-btn" data-tab="fastspring">
+          <img class="tab-icon" src="icons/fastspring32.png" width="27" height="27" alt="" aria-hidden="true">
+          <span class="tab-label" data-i18n="tab-fastspring">Fastspring</span>
+        </button>
+        <button type="button" class="tab-btn active" data-tab="confirmation">
+          <img class="tab-icon" src="icons/linkdeconfrimação32.png" width="27" height="27" alt="" aria-hidden="true">
+          <span class="tab-label" data-i18n="tab-confirmation">Link de confirmação</span>
+        </button>
+        <button type="button" class="tab-btn" data-tab="accounts">
+          <img class="tab-icon" src="icons/profile32.png" width="27" height="27" alt="" aria-hidden="true">
+          <span class="tab-label" data-i18n="tab-accounts">Contas</span>
+        </button>
+        <button type="button" class="tab-btn" data-tab="log">
+          <img class="tab-icon" src="icons/log32.png" width="27" height="27" alt="" aria-hidden="true">
+          <span class="tab-label" data-i18n="tab-log">Log</span>
+          <span class="tab-badge" id="tab-log-badge" hidden>0</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Tab Content -->
+  <main class="content">
+
+    <!-- Tab 1: Confirmation Link -->
+    <section id="tab-confirmation" class="tab-panel active">
+      <form id="form-confirmation" novalidate>
+        <div class="form-group">
+          <label for="conf-email" data-i18n="label-email">Email do destinatário</label>
+          <input type="email" id="conf-email" data-i18n-placeholder="placeholder-email" placeholder="usuario@email.com" required>
+          <span class="field-error" id="conf-email-error"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="conf-link" data-i18n="label-conf-link">Link de confirmação</label>
+          <input type="text" id="conf-link" data-i18n-placeholder="placeholder-text" placeholder="Cole o link ou texto aqui..." required>
+          <span class="field-error" id="conf-link-error"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="conf-agent" data-i18n="label-agent">Agente</label>
+          <select id="conf-agent" required>
+            <option value="" data-i18n="placeholder-agent-select">Selecione o agente</option>
+          </select>
+          <span class="field-error" id="conf-agent-error"></span>
+        </div>
+
+        <button type="submit" class="btn-submit" id="conf-submit" aria-busy="false">
+          <span class="btn-text" data-i18n="btn-submit">Enviar</span>
+          <span class="btn-loading">
+            <span class="spinner" aria-hidden="true"></span>
+            <span data-i18n="btn-submitting">Enviando...</span>
+          </span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Tab 2: Fastspring -->
+    <section id="tab-fastspring" class="tab-panel">
+      <form id="form-fastspring" novalidate>
+        <div class="form-group">
+          <label for="fs-reason" data-i18n="label-reason">Motivo da requisição</label>
+          <select id="fs-reason" required>
+            <option value="" data-i18n="fs-reason-placeholder">Selecione o motivo</option>
+            <option value="whitelist" data-i18n="fs-reason-whitelist">Whitelist de usuário para comprar novamente</option>
+            <option value="email_change" data-i18n="fs-reason-email-change">Atualizar o Email de Acesso ao Painel de Cobrança</option>
+            <option value="invoice_data_change" data-i18n="fs-reason-invoice-data">Alteração de dados do invoice</option>
+          </select>
+          <span class="field-error" id="fs-reason-error"></span>
+        </div>
+
+        <div id="fs-after-reason" class="fs-after-reason" hidden>
+          <div class="form-group">
+            <label for="fs-email" data-i18n="label-email">Email do destinatário</label>
+            <input type="email" id="fs-email" data-i18n-placeholder="placeholder-email" placeholder="usuario@email.com" required>
+            <span class="field-error" id="fs-email-error"></span>
+          </div>
+
+          <div id="fs-email-change-fields" class="conditional-fields" hidden>
+            <div class="form-group">
+              <label for="fs-email-from" data-i18n="label-email-from">From (email antigo)</label>
+              <input type="email" id="fs-email-from" data-i18n-placeholder="placeholder-email-from" placeholder="antigo@email.com">
+              <span class="field-error" id="fs-email-from-error"></span>
+            </div>
+            <div class="form-group">
+              <label for="fs-email-to" data-i18n="label-email-to">To (novo email)</label>
+              <input type="email" id="fs-email-to" data-i18n-placeholder="placeholder-email-to" placeholder="novo@email.com">
+              <span class="field-error" id="fs-email-to-error"></span>
+            </div>
+          </div>
+
+          <div id="fs-invoice-fields" class="conditional-fields" hidden>
+            <div class="form-group">
+              <label for="fs-notes" data-i18n="label-invoice-notes">Descrição das alterações necessárias</label>
+              <textarea id="fs-notes" rows="3" data-i18n-placeholder="placeholder-invoice-notes" placeholder="Descreva as alterações de dados do invoice..."></textarea>
+              <span class="field-error" id="fs-notes-error"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="fs-agent" data-i18n="label-agent">Agente</label>
+            <select id="fs-agent" required>
+              <option value="" data-i18n="placeholder-agent-select">Selecione o agente</option>
+            </select>
+            <span class="field-error" id="fs-agent-error"></span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="fs-submit" aria-busy="false">
+            <span class="btn-text" data-i18n="btn-submit">Enviar</span>
+            <span class="btn-loading">
+              <span class="spinner" aria-hidden="true"></span>
+              <span data-i18n="btn-submitting">Enviando...</span>
+            </span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Tab 3: Settings -->
+    <section id="tab-settings" class="tab-panel">
+      <div class="settings-card">
+        <h3 class="card-title" data-i18n="settings-agents-title">Cadastro de Agentes</h3>
+        <div class="agent-input-row">
+          <input type="text" id="agent-name-input" data-i18n-placeholder="placeholder-agent-name" placeholder="Nome do agente" class="agent-input">
+          <button type="button" id="btn-add-agent" class="btn-add">+</button>
+        </div>
+        <ul id="agent-list" class="agent-list"></ul>
+        <p id="no-agents-msg" class="empty-msg" data-i18n="no-agents">Nenhum agente cadastrado.</p>
+      </div>
+    </section>
+
+    <!-- Tab 4: Accounts -->
+    <section id="tab-accounts" class="tab-panel">
+      <form id="form-accounts" novalidate>
+        <div class="form-group">
+          <label for="acc-reason" data-i18n="label-reason">Tipo de solicitação</label>
+          <select id="acc-reason" required>
+            <option value="" data-i18n="acct-reason-placeholder">Selecione o tipo</option>
+            <option value="delete_account" data-i18n="acct-reason-delete">Deletar conta</option>
+            <option value="cancel_plan" data-i18n="acct-reason-cancel-plan">Cancelar plano</option>
+            <option value="cancel_linkedin_automation" data-i18n="acct-reason-cancel-linkedin">Cancelar LinkedIn Automation</option>
+          </select>
+          <span class="field-error" id="acc-reason-error"></span>
+        </div>
+
+        <div id="acc-after-reason" class="acc-after-reason" hidden>
+          <div class="form-group">
+            <label for="acc-region" data-i18n="label-region">Região</label>
+            <select id="acc-region">
+              <option value="" data-i18n="region-placeholder">Selecione a região</option>
+              <option value="Global" data-i18n="region-global">Global</option>
+              <option value="Brazil" data-i18n="region-brazil">Brazil</option>
+            </select>
+            <span class="field-error" id="acc-region-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="acc-email" data-i18n="label-email">Email do destinatário</label>
+            <input type="email" id="acc-email" data-i18n-placeholder="placeholder-email" placeholder="usuario@email.com" required>
+            <span class="field-error" id="acc-email-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="acc-agent" data-i18n="label-agent">Agente</label>
+            <select id="acc-agent" required>
+              <option value="" data-i18n="placeholder-agent-select">Selecione o agente</option>
+            </select>
+            <span class="field-error" id="acc-agent-error"></span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="acc-submit" aria-busy="false">
+            <span class="btn-text" data-i18n="btn-submit">Enviar</span>
+            <span class="btn-loading">
+              <span class="spinner" aria-hidden="true"></span>
+              <span data-i18n="btn-submitting">Enviando...</span>
+            </span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Tab 5: Log -->
+    <section id="tab-log" class="tab-panel tab-panel--log">
+      <div class="log-tab-header">
+        <div class="log-tab-header-top">
+          <h2 class="log-tab-title" data-i18n="log-title">Log de envios</h2>
+          <button type="button" id="log-clear" class="log-clear-btn" data-i18n="log-clear">Limpar</button>
+        </div>
+        <p class="log-tab-hint" data-i18n="log-hint">Mantido até você fechar o navegador por completo.</p>
+      </div>
+      <ul id="log-list" class="log-list log-list--full">
+        <li class="log-empty" data-i18n="log-empty">Nenhum envio registrado.</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Modal Sobre + Bug Report -->
+  <div id="about-modal" class="modal-overlay" hidden>
+    <div class="modal-about" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
+      <h2 id="about-modal-title" class="modal-about-title" data-i18n="about-title">Sobre</h2>
+      <p class="about-text"><strong data-i18n="about-product">Webhook Tool</strong></p>
+      <p class="about-text"><span data-i18n="about-version-label">Versão</span> <span id="about-version"></span></p>
+      <p class="about-text muted" data-i18n="about-internal">Extensão para envio de requisições via webhook (Make, n8n e similares), usada para disparar e-mails e follow-ups padronizados.</p>
+
+      <div class="modal-divider"></div>
+
+      <h3 class="modal-bug-title" data-i18n="about-bug-title">Reportar Bug</h3>
+      <p class="about-text muted" data-i18n="about-bug-desc">Encontrou um problema? Descreva o que aconteceu e envie para o email abaixo.</p>
+      <div class="modal-bug-email-row">
+        <span class="modal-bug-email">github.com/Fernandosgoes/webhook-tool/issues</span>
+        <button type="button" class="btn-copy-email" id="btn-copy-email" data-i18n-title="about-bug-copy" title="Copiar email">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span id="copy-email-label" data-i18n="about-bug-copy">Copiar email</span>
+        </button>
+      </div>
+
+      <button type="button" class="modal-about-close" id="about-modal-close" data-i18n="about-close">Fechar</button>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="i18n.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
